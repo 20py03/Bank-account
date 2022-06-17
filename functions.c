@@ -184,9 +184,13 @@ void* pretrazivanjeKorisnika(KORISNIK* const poljeKorisnika) {
 	return NULL;
 }
 void upisNaRacun(KORISNIK* const trazeniKorisnik) {
-	int b = trazeniKorisnik->id;
 	FILE* fp = fopen("banka.bin", "rb+");
-	fseek(fp, sizeof(KORISNIK) * b, SEEK_CUR);
+	if (fp == NULL) {
+		perror("Modifikacija racuna nije moguca!\n");
+		exit(EXIT_FAILURE);
+	}
+	fseek(fp,sizeof(int),SEEK_SET);
+	fseek(fp, sizeof(KORISNIK) * trazeniKorisnik->id, SEEK_CUR);
 	fwrite(trazeniKorisnik, sizeof(KORISNIK), 1, fp);
 	rewind(fp);
 	fwrite(&brojKorisnika, sizeof(int), 1, fp);
@@ -218,7 +222,7 @@ void modificiranjeRacuna(const KORISNIK* const poljeKorisnika, KORISNIK* const t
 		printf("\n\tUNESITE KOLICINU NOVCA KOJU ZELITE UPLATITI NA RACUN\n\t");
 		scanf("%f", &uplata);
 
-		if((uplata < 0)){
+		if ((uplata < 0)) {
 			printf("\n\tUNOS UPLATE NE MOZE BITI MANJI OD 0:\n\t");
 			getchar();
 			scanf("%f", &uplata);
@@ -226,6 +230,7 @@ void modificiranjeRacuna(const KORISNIK* const poljeKorisnika, KORISNIK* const t
 		} 
 		trazeniKorisnik->stanje += uplata;
 		upisNaRacun(trazeniKorisnik);
+		
 		break;
 
 	case 2:
@@ -233,7 +238,7 @@ void modificiranjeRacuna(const KORISNIK* const poljeKorisnika, KORISNIK* const t
 
 		scanf("%f", &isplata);
 
-		if (trazeniKorisnik->stanje > 0 && isplata <= trazeniKorisnik->stanje && !isalpha(isplata)) {
+		if (trazeniKorisnik->stanje > 0 && isplata <= trazeniKorisnik->stanje ) {
 			trazeniKorisnik->stanje -= isplata;
 			upisNaRacun(trazeniKorisnik);
 		}
